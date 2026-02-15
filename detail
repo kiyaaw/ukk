@@ -2,12 +2,12 @@
 $koneksi = mysqli_connect ("localhost", "root", "", "ujikom_12rpl2_kiyaa");
 
 // cek id dari URL
-if (!isset($_GET['id-pelaporan'])) {
+if (!isset($_GET[`id-pelaporan`])) {
     echo "Id pengaduan tidak ditemukan";
     exit;
 }
 
-$id = $_GET['id'];
+$id = $_GET[`id-pelaporan`];
 
 // update data
 if (isset($_POST['simpan'])){
@@ -33,7 +33,7 @@ if (!$data){
 }
 ?>
 
-<h2> Detail Pengaduan #<?=$data['id-pelaporan']; ?></h2>
+<h2> Detail Pengaduan <?=$data[`id-pelaporan`]; ?></h2>
 <hr>
 <table cellpedding="8">
     <tr>
