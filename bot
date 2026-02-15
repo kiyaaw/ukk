@@ -1,9 +1,21 @@
-if (!$data) {
-    echo "Username tidak ditemukan";
-    exit;
-}
+if ($data) {
+    if (password_verify($password, $data["password"])) {
 
-if (!password_verify($password, $data["password"])) {
-    echo "Password salah";
-    exit;
+        $_SESSION['nama'] = $data['username'];
+        $_SESSION['role'] = $data['role'];
+
+        if ($data['role'] == 'admin') {
+            header("Location: admin/dashboard-admin.php");
+            exit;
+        } else if ($data['role'] == 'siswa') {
+            header("Location: dashboard.php");
+            exit;
+        }
+
+    } else {
+        echo "Password salah";
+    }
+
+} else {
+    echo "Username tidak ditemukan";
 }
