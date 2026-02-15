@@ -2,23 +2,25 @@
 session_start();
 
 if(!isset($_SESSION['nis'])){
-    header("Location: login.php");
-    exit;
+header("Location: login.php");
+exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Data Pengaduan</title>
 </head>
 <body>
-<p>login sebagai: <?= $_SESSION ['nama']; ?></p>
-<p>NIS:<?= $_SESSION['nis']; ?> </p>
-<h2>Data Pengaduan </h2>
+    
+<h2> Data Pengaduan </h2>
+<p>Login sebagai: <?= $_SESSION['username']; ?></p>
+<p>NIS: <?= $_SESSION['nis']; ?></p>
 
-<table border="1" cellpadding="10" cellspacing="0"> 
+    <table border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>No</th>
         <th>Tanggal</th>
@@ -28,14 +30,18 @@ if(!isset($_SESSION['nis'])){
         <th>Status</th>
         <th>Detail</th>
     </tr>
-<?php
-$koneksi = mysqli_connect ("localhost", "root", "", "ujikom_12rpl2_kiyaa");
-$no = 1;
 
-$query = mysqli_query($koneksi, "SELECT * FROM `input-aspirasi`");
+    <?php 
+    $koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_feby");
 
-while ($data = mysqli_fetch_assoc($query)) {
-?>
+    $query = mysqli_query($koneksi, "SELECT * FROM `input-asprirasi`");
+
+
+    $no = 1;
+
+    while ($data = mysqli_fetch_assoc($query)){
+    ?>
+
     <tr>
         <td><?= $no++ ?></td>
         <td><?= $data['tanggal'] ?></td>
@@ -43,13 +49,15 @@ while ($data = mysqli_fetch_assoc($query)) {
         <td><?= $data['lokasi'] ?></td>
         <td><?= $data['ket'] ?></td>
         <td><?= $data['status'] ?></td>
-        <td>
-            <a href="detail-aspirasi.php?id<?= $data [`id-pelaporan`] ?>" >
+        <td> 
+            <a href="detail_pengaduan.php?id=<?= $data['id_pelaporan'] ?>">
                 <button>Detail</button>
             </a>
         </td>
     </tr>
-<?php } ?>
-</table>
+
+    <?php } ?>
+
+    </table>
 </body>
 </html>
