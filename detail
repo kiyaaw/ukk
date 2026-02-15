@@ -1,0 +1,65 @@
+<?php
+$koneksi = mysqli_connect ("localhost", "root", "", "ujikom_12rpl2_kiyaa");
+
+// cek id dari URL
+if (!isset($_GET['id-pelaporan'])) {
+    echo "Id pengaduan tidak ditemukan";
+    exit;
+}
+
+$id = $_GET['id'];
+
+// update data
+if (isset($_POST['simpan'])){
+    $status = $_POST['status'];
+    $feedback = $_POST['feedback'];
+
+    mysqli_query($koneksi, "UPDATE `input-aspirasi` SET status='$status', feedback='$feedback' WHERE `id-pelaporan`='$id'");
+
+    header("Location: admin.php");
+    exit;
+}
+
+// buat ambil data
+$query = mysqli_query($koneksi. "SELECT `input-aspirasi` JOIN kategori ON `input-aspirasi`.kategori = kategori.`ket-kategori` WHERE `id-pelaporan` = $`id-pelaporan`");
+
+//  ubah hasil query menjadi array
+$data = mysqli_fetch_assoc($query);
+
+// jika data tidak ditemukan, kembali ke halaman utama (dashboard)
+if (!$data){
+    header("Location: dashboard.php");
+    exit();
+}
+?>
+
+<h2> Detail Pengaduan #<?=$data['id-pelaporan']; ?></h2>
+<hr>
+<table cellpedding="8">
+    <tr>
+        <td><strong>NIS pelapor</strong></td>
+        <td>: <?= $data['nis']; ?></td>
+    </tr>
+    <tr>
+        <td><strong> Kategori</strong></td>
+        <td>: <?= $data['ket-kategori']; ?></td>
+    </tr>
+    <tr>
+        <td><strong> Lokasi</strong></td>
+        <td>: <?= $data['lokasi']; ?></td>
+    </tr>
+    <tr>
+        <td><strong> Isi Laporan</strong></td>
+        <td>: <?= $data['ket']; ?></td>
+    </tr>
+    <tr>
+        <td><strong> Status Saat Ini </strong></td>
+        <td>: <span style="color:red;"><?= strtoupper($data['status']); ?></span></td>
+    </tr>
+    <tr>
+        <td><strong> Tanggapan Admin</strong></td>
+        <td>: <i><?= $data['feedback']? $data['feedback']: "Belum ada respon dari admin"; ?></i></td>
+    </tr>
+</table>
+<br>
+<a href="index.php"> Kembali ke daftar </a> 
