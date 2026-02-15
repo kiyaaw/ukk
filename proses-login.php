@@ -1,27 +1,32 @@
 <?php
 session_start();
-$koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_kiyaa");
 
-$username = $_POST ['username'];
-$password = $_POST ['password'];
+$koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_feby");
 
-$query = mysqli_query($koneksi, "SELECT * FROM user WHERE username='$username'");
+$username = $_POST['username'];
+$password = $_POST['password'];
 
+$query = mysqli_query($koneksi, "SELECT * FROM user WHERE username ='$username'");
 $data = mysqli_fetch_array($query);
 
-if ($data){
-    if (password_verify($password, $data ["password"])) {
-        $_SESSION['nama'] = $data['username'];
-        $_SESSION['role'] = $data['role'];
-    
-    if ($data ['role'] == 'admin') {
-        header ("Location: admin/dashboard-admin.php");
+if ($data) {
+    if(password_verify($password, $data["password"])) {
 
-    } else if ($data ['role'] == 'siswa') {
-        header ("Location: dashboard.php");
+        $_SESSION['nama'] = $data['nama'];
+        $_SESSION['nis'] = $data['nis']; 
+
+        if ($data['role'] == "admin") {
+            header("Location: admin/halaman-admin.php");
+            exit;
+        } else if ($data['role'] == "siswa") {
+            header("Location: dashboard-siswa.php");
+            exit;
+        }
+
     } else {
-        echo "password salah";
+        echo "Password salah";
     }
-    }
-} 
+} else {
+    echo "Username tidak ditemukan";
+}
 ?>
