@@ -1,63 +1,167 @@
 <?php
-session_start();
+$koneksi = mysqli_connect ("localhost", "root", "", "ujikom_12rpl2_kiyaa");
 
-if(!isset($_SESSION['nis'])){
-header("Location: login.php");
-exit;
+// cek id dari url
+if (!isset($_GET['id'])) {
+    echo "Id pengaduan tidak ditemukan";
+    exit;
+}
+
+$id = $_GET['id'];
+
+// update data
+if (isset($_POST['simpan'])) {
+    $status = $_POST['status'];
+    $feedback = $_POST['feedback'];
+
+    mysqli_query($koneksi, "UPDATE `input-aspirasi` SET status='$status', feedback='$feedback' WHERE `id-pelaporan`='$id' ");
+
+    header("Location: admin.php");
+    exit;
+}
+
+// buat ngambil data
+$query = mysqli_query($koneksi, "SELECT `input-aspirasi` .*, kategori.`ket-kategori` FROM `input-aspirasi` LEFT JOIN kategori ON `input-aspirasi`.`id-kategori` = kategori.`ket-kategori` WHERE `input-aspirasi`.`id-pengaduan` = '$id'");
+
+$data = mysqli_fetch_assoc($query);
+
+if (!$data) {
+    echo "data pengaduan tidak ditemukan";
+    exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pengaduan</title>
+    <title>Document</title>
 </head>
 <body>
-    
-<h2> Data Pengaduan </h2>
-<p>Login sebagai: <?= $_SESSION['username']; ?></p>
-<p>NIS: <?= $_SESSION['nis']; ?></p>
+    <h2> Detail Pengaduan </h2>
+    <form>
+        <table>
+            <tr>
+                <td><b> Id pengaduan </b></td>
+                <td><?= $data['id-pengaduan'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Kategori </b></td>
+                <td><?= $data['ket-kategori'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Lokasi </b></td>
+                <td><?= $data['lokasi'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Keterangan </b></td>
+                <td><?= $data['ket'] ?></td>
+            </tr>
 
-    <table border="1" cellpadding="10" cellspacing="0">
-    <tr>
-        <th>No</th>
-        <th>Tanggal</th>
-        <th>Kategori</th>
-        <th>Lokasi</th>
-        <th>Keterangan</th>
-        <th>Status</th>
-        <th>Detail</th>
-    </tr>
+            <!-- ubah status -->
+            <tr>
+                <td><b> Status </b></td>
+                <td>
+                    <select name="status">
+                        <option value="Proses" <?= $data['status'] == 'Proses' ? 'selected' : ''?>>Proses</option>
+                        <option value="Selesai" <?= $data['status'] == 'Proses' ? 'selesai' : ''?>>Selesai</option>
+                    </select>
+                </td>
+            </tr>
+            <!-- feedback -->
+            <tr>
+                <td><b>Feedback Admin</b></b>
+                <td>
+                    <textarea name="Feedback" rows="4" cols="40"><?= $data['feedback'] ?></textarea>
+                </td> 
+            </tr>
+        </table>
+        <br>
+        <button type="submit" name="simpan"> simpan perubahan </button>
+        <a href="admin.php">kembali</a>
+    </form>
+</body>
+</html><?php
+$koneksi = mysqli_connect ("localhost", "root", "", "ujikom_12rpl2_kiyaa");
 
-    <?php 
-    $koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_feby");
+// cek id dari url
+if (!isset($_GET['id'])) {
+    echo "Id pengaduan tidak ditemukan";
+    exit;
+}
 
-    $query = mysqli_query($koneksi, "SELECT * FROM `input-asprirasi`");
+$id = $_GET['id'];
 
+// update data
+if (isset($_POST['simpan'])) {
+    $status = $_POST['status'];
+    $feedback = $_POST['feedback'];
 
-    $no = 1;
+    mysqli_query($koneksi, "UPDATE `input-aspirasi` SET status='$status', feedback='$feedback' WHERE `id-pelaporan`='$id' ");
 
-    while ($data = mysqli_fetch_assoc($query)){
-    ?>
+    header("Location: admin.php");
+    exit;
+}
 
-    <tr>
-        <td><?= $no++ ?></td>
-        <td><?= $data['tanggal'] ?></td>
-        <td><?= $data['kategori'] ?></td>
-        <td><?= $data['lokasi'] ?></td>
-        <td><?= $data['ket'] ?></td>
-        <td><?= $data['status'] ?></td>
-        <td> 
-            <a href="detail_pengaduan.php?id=<?= $data['id_pelaporan'] ?>">
-                <button>Detail</button>
-            </a>
-        </td>
-    </tr>
+// buat ngambil data
+$query = mysqli_query($koneksi, "SELECT `input-aspirasi` .*, kategori.`ket-kategori` FROM `input-aspirasi` LEFT JOIN kategori ON `input-aspirasi`.`id-kategori` = kategori.`ket-kategori` WHERE `input-aspirasi`.`id-pengaduan` = '$id'");
 
-    <?php } ?>
+$data = mysqli_fetch_assoc($query);
 
-    </table>
+if (!$data) {
+    echo "data pengaduan tidak ditemukan";
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2> Detail Pengaduan </h2>
+    <form>
+        <table>
+            <tr>
+                <td><b> Id pengaduan </b></td>
+                <td><?= $data['id-pengaduan'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Kategori </b></td>
+                <td><?= $data['ket-kategori'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Lokasi </b></td>
+                <td><?= $data['lokasi'] ?></td>
+            </tr>
+            <tr>
+                <td><b> Keterangan </b></td>
+                <td><?= $data['ket'] ?></td>
+            </tr>
+
+            <!-- ubah status -->
+            <tr>
+                <td><b> Status </b></td>
+                <td>
+                    <select name="status">
+                        <option value="Proses" <?= $data['status'] == 'Proses' ? 'selected' : ''?>>Proses</option>
+                        <option value="Selesai" <?= $data['status'] == 'Proses' ? 'selesai' : ''?>>Selesai</option>
+                    </select>
+                </td>
+            </tr>
+            <!-- feedback -->
+            <tr>
+                <td><b>Feedback Admin</b></b>
+                <td>
+                    <textarea name="Feedback" rows="4" cols="40"><?= $data['feedback'] ?></textarea>
+                </td> 
+            </tr>
+        </table>
+        <br>
+        <button type="submit" name="simpan"> simpan perubahan </button>
+        <a href="admin.php">kembali</a>
+    </form>
 </body>
 </html>
