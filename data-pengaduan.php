@@ -1,98 +1,153 @@
 <?php
-$koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_kiyaa");
+$koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_feby");
 
-if (!$koneksi) {
+if(!$koneksi){
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-/* =========================
-   AMBIL DATA KATEGORI
-   ========================= */
-$kategori_query = mysqli_query($koneksi, "SELECT * FROM `kategori`");
+// =====================
+// DELETE
+// =====================
+if (isset($_GET['hapus'])) {
+    $id = $_GET['hapus'];
 
-/* =========================
-   QUERY LAPORAN ASPIRASI
-   ========================= */
+    $delete = mysqli_query($koneksi, "DELETE FROM `input-asprirasi` WHERE id_pelaporan = '$id'");
 
-$query_text = "SELECT * FROM `input-aspirasi`
-               LEFT JOIN kategori 
-               ON `input-aspirasi`.`kategori` = kategori.`ket-kategori`
-               WHERE 1=1";
-
-/* FILTER KATEGORI */
-if (isset($_GET['kategori']) && $_GET['kategori'] != "") {
-    $kat = $_GET['kategori'];
-    $query_text .= " AND `input-aspirasi`.`kategori` = '$kat'";
+    if ($delete) {
+        echo "<script>alert('Data berhasil dihapus'); window.location='list-aspirasi.php';</script>";
+    } else {
+        echo "<script>alert('Gagal menghapus data');</script>";
+    }
 }
 
-/* FILTER NIS */
-if (isset($_GET['nis']) && $_GET['nis'] != "") {
-    $nis = $_GET['nis'];
-    $query_text .= " AND `input-aspirasi`.`nis` = '$nis'";
-}
+// =====================
+// AMBIL FILTER
+// =====================
+$tanggal = $_GET['tanggal'] ?? "";
+$nis = $_GET['nis'] ?? "";
+$kategori = $_GET['kategori'] ?? "";
+$status = $_GET['status'] ?? "";
 
-$query = mysqli_query($koneksi, $query_text);
-$no = 1;
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Aspirasi</title>
+    <title>Data Pengaduan</title>
 </head>
 <body>
 
-<h2>Laporan Aspirasi</h2>
+<h2>Data Pengaduan</h2>
 
+<!-- ===================== -->
+<!-- FORM SEARCH -->
+<!-- ===================== -->
 <form method="GET">
-    <label>Filter Kategori:</label>
-    <select name="kategori">
-        <option value="">--Semua Kategori--</option>
+    Tanggal: 
+    <input type="date" name="tanggal" value="<?= $tanggal ?>">
 
-        <?php while ($kat = mysqli_fetch_assoc($kategori_query)) { ?>
-            <option value="<?= $kat['id-kategori'] ?>"
-                <?= (isset($_GET['kategori']) && $_GET['kategori'] == $kat['id-kategori']) ? 'selected' : '' ?>>
-                <?= $kat['ket-kategori'] ?>
-            </option>
-        <?php } ?>
+    NIS: 
+    <input type="text" name="nis" value="<?= $nis ?>">
+
+    Kategori:
+    <input type="text" name="kategori" value="<?= $kategori ?>">
+
+    Status:
+    <select name="status">
+        <option value=""> </option>
+        <option value="proses" <?= ($status=="proses")?"selected":"" ?>>Proses</option>
+        <option value="selesai" <?= ($status=="selesai")?"selected":"" ?>>Selesai</option>
     </select>
 
-    <label>Cari NIS:</label>
-    <input type="text" name="nis" placeholder="Masukkan NIS"
-        value="<?= isset($_GET['nis']) ? $_GET['nis'] : '' ?>">
-
-    <button type="submit">Filter Data</button>
+    <button type="submit">Cari</button>
 </form>
 
 <br>
 
 <table border="1" cellpadding="10" cellspacing="0">
-<tr>
-    <th>No</th>
-    <th>Tanggal</th>
-    <th>NIS</th>
-    <th>Kategori</th>
-    <th>Lokasi</th>
-    <th>Keterangan</th>
-    <th>Status</th>
-    <th>Detail</th>
-</tr>
+    <tr>
+        <th>No</th>
+        <th>NIS</th>
+        <th>Tanggal</th>
+        <th>Kategori</th>
+        <th>Lokasi</th>
+        <th>Keterangan</th>
+        <th>Status</th>
+        <th>Detail</th>
+        <th>Aksi</th>
+    </tr>
 
-<?php while ($data = mysqli_fetch_assoc($query)) { ?>
+<?php
+$no = 1;
+
+// =====================
+// QUERY DASAR
+// =====================
+$sql = "
+    SELECT `input-asprirasi`.*, user.nis 
+    FROM `input-asprirasi`
+    JOIN user ON `input-asprirasi`.nis = user.nis
+    WHERE 1=1
+";
+
+// =====================
+// TAMBAH FILTER
+// =====================
+if($tanggal != ""){
+    $sql .= " AND tanggal = '$tanggal'";
+}
+
+if($nis != ""){
+    $sql .= " AND `input-asprirasi`.nis LIKE '%$nis%'";
+}
+
+if($kategori != ""){
+    $sql .= " AND kategori LIKE '%$kategori%'";
+}
+
+if($status != ""){
+    $sql .= " AND status = '$status'";
+}
+
+// =====================
+// EKSEKUSI QUERY
+// =====================
+$query = mysqli_query($koneksi, $sql);
+
+if(!$query){
+    die("Query error: " . mysqli_error($koneksi));
+}
+
+while ($data = mysqli_fetch_assoc($query)) {
+?>
+
 <tr>
     <td><?= $no++ ?></td>
-    <td><?= $data['tanggal'] ?></td>
     <td><?= $data['nis'] ?></td>
-    <td><?= $data['ket-kategori'] ?></td>
+    <td><?= $data['tanggal'] ?></td>
+    <td><?= $data['kategori'] ?></td>
     <td><?= $data['lokasi'] ?></td>
     <td><?= $data['ket'] ?></td>
     <td><?= $data['status'] ?></td>
+
     <td>
-        <a href="detail-pengaduan.php?id=<?= $data['id-pelaporan'] ?>">
-            <button type="button">Detail</button>
+        <a href="tampilan-detail.php?id=<?= $data['id_pelaporan'] ?>">
+            <button>Detail</button>
+        </a>
+    </td>
+
+    <td>
+        <a href="detail-pengaduan.php?id=<?= $data['id_pelaporan'] ?>">
+            <button>Edit</button>
+        </a>
+
+        <a href="?hapus=<?= $data['id_pelaporan'] ?>" 
+           onclick="return confirm('Yakin mau hapus data ini?')">
+            <button>Hapus</button>
         </a>
     </td>
 </tr>
+
 <?php } ?>
 
 </table>
