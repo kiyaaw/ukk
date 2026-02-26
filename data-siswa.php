@@ -1,4 +1,5 @@
 <?php
+
 // koneksi
 $koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_kiyaa");
 
