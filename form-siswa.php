@@ -1,28 +1,7 @@
 <?php
-$koneksi = mysqli_connect("localhost", "root", "", "ujikom_12rpl2_kiyaa");
+session_start();
+include 'config/auth.php';
 
-if (!$koneksi) {
-    die("Koneksi gagal: " . mysqli_connect_error());
-}
-
-if (isset($_POST['nis'])) {
-
-    $nis = $_POST['nis'];
-    $nama = $_POST['nama'];
-    $kelas = $_POST['kelas'];
-    $password = $_POST['pass'];
-
-    $insert = mysqli_query($koneksi,
-        "INSERT INTO user (nis, username, kelas, password, role)
-         VALUES ('$nis', '$nama', '$kelas', '$password', 'siswa')"
-    );
-
-    if ($insert) {
-        echo "<script>alert('Data berhasil ditambahkan');</script>";
-    } else {
-        echo "Gagal: " . mysqli_error($koneksi);
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +12,7 @@ if (isset($_POST['nis'])) {
 </head>
 <body>
     HALAMAN TAMBAH DATA SISWA
-    <form action="data-siswa.php" method="POST">
+    <form action="proses-tambah-siswa.php" method="POST">
       <div>
         <label for=""> NIS :</label> <br>
         <input type="text" name= "nis"/>
@@ -44,13 +23,16 @@ if (isset($_POST['nis'])) {
       </div>
       <div>
       <label for=""> Kelas : </label> <br>
-        <textarea name="kelas"></textarea>
+        <select name="kelas" id="">
+          <option value="12 RPL 1"> 12 RPL 1 </option>
+          <option value="12 RPL 2"> 12 RPL 2 </option>
+        </select>
       </div>
 
       <label for=""> password : </label> <br>
         <input name="pass"></input>
       </div>
-      <button type="submit" >KIRIM</button>
+      <button type="submit" name="simpan" >KIRIM</button>
     </form>
 </body>
 </html>
